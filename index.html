@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Download Instagram video</title>
+    <meta name="description" content="Download and save video from Instagram">
+    <meta name="robots" content="index,follow">
+
+    <style>
+        * {
+            color: #53788e;
+            border-color: #53788e;
+            outline-color: #53788e;
+            font-size: 18px;
+        }
+
+        *:focus {
+            border-color: #53788e;
+            outline-color: #53788e;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            margin: 0 auto;
+            max-width: 640px;
+            background-color: aliceblue;
+            color: #53788e;
+            padding: 20px;
+        }
+
+        .params, .results {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 580px;
+        }
+
+        textarea {
+            width: 630px;
+            height: 200px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+        <h1>Download video from Instagram</h1>
+        <div class="params">
+            <input type="text" name="url" id="url" placeholder="Insert url...">
+            <button class="btn" id="btn_go">Get</button>
+        </div>
+        <div class="results">
+            <textarea id="results" placeholder="Result here..."></textarea>
+        </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $('body').on('click', '#btn_go', function () {
+        getUrl($('#url').val());
+    });
+
+    function getUrl(url) {
+        $('#results').val('');
+        var data = {};
+        $.ajax({
+            url: url,
+            data: data,
+            success: ajaxSuccess,
+            error: ajaxError
+        });
+    }
+
+    function ajaxSuccess(data) {
+        var videoLink = null;
+
+        $.each($(data), function (i, el) {
+            if (el.tagName && el.tagName.toLowerCase() == 'meta') {
+                if ($(el).attr('property') && $(el).attr('property').toLowerCase() == 'og:video') {
+                    videoLink = $(el).attr('content');
+                }
+            }
+            ;
+        });
+
+        if (videoLink) {
+            $('#results').val(videoLink);
+
+            var link = document.createElement('a');
+            link.href = videoLink;
+            link.download = videoLink;
+            link.target = '_blank';
+            link.click();
+        } else {
+            $('#results').val('Not found!');
+        }
+    }
+
+    function ajaxError(x, status, er) {
+        $('#results').val('Loading error!\n' + status + '\n' + er);
+    }
+
+</script>
+</body>
+</html>
